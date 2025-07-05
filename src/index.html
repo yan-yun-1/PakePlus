@@ -1,32 +1,458 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频探索平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FE2C55',
+                        secondary: '#2563EB',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #FE2C55 0%, #FF7D94 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-play-circle text-primary text-3xl"></i>
+                <h1 class="text-xl font-bold text-dark">视频探索平台</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" class="text-gray-700 hover:text-primary transition-custom font-medium">首页</a>
+                <a href="#" class="text-gray-700 hover:text-primary transition-custom font-medium">发现</a>
+                <a href="#" class="text-gray-700 hover:text-primary transition-custom font-medium">分类</a>
+                <a href="#" class="text-gray-700 hover:text-primary transition-custom font-medium">关于我们</a>
+            </nav>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-gray-700 hover:text-primary">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200 py-2 px-4">
+            <a href="#" class="block py-2 text-gray-700 hover:text-primary">首页</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-primary">发现</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-primary">分类</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-primary">关于我们</a>
+        </div>
+    </header>
 
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
-            <form class="row" id="greet-form">
-                <input id="inputValue" placeholder="Enter a something..." />
-            </form>
-            <div class="resultBox">
-                <span>result: </span>
-                <span id="result"></span>
+    <!-- 主要内容 -->
+    <main class="flex-grow">
+        <!-- 欢迎部分 -->
+        <section class="bg-gradient-primary text-white py-16 md:py-24">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-shadow">探索精彩视频世界</h2>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] max-w-2xl mx-auto mb-8 opacity-90">
+                    在这里，您可以发现海量有趣的短视频内容，让每一刻都充满惊喜
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="start-btn" class="bg-white text-primary font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-custom">
+                        开始探索
+                    </button>
+                    <button class="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white/10 transition-custom">
+                        了解更多
+                    </button>
+                </div>
             </div>
-            <div class="invokeBox">
-                <button id="openUrl">open_url_browser</button>
-                <button id="openUrlNew">open_url_new</button>
-                <button id="runCommand">run_command</button>
-                <button id="downloadFile">download_file</button>
-                <button id="getExeDir">get_exe_dir</button>
-                <button id="getEnvVar">get_env_var</button>
-                <button id="findPort">find_port</button>
+        </section>
+
+        <!-- 第一次跳转页面 -->
+        <section id="first-step" class="py-16 bg-white hidden">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto bg-gray-50 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-primary p-6 text-white">
+                        <h2 class="text-2xl font-bold">第一步：选择内容类别</h2>
+                        <p class="opacity-90 mt-1">根据您的兴趣，选择您想要浏览的视频类别</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="funny">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-smile-o text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">搞笑</h3>
+                                <p class="text-gray-600 text-sm mt-1">让您捧腹大笑的有趣视频</p>
+                            </div>
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="music">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-music text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">音乐</h3>
+                                <p class="text-gray-600 text-sm mt-1">热门音乐和原创歌曲</p>
+                            </div>
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="dance">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-moon-o text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">舞蹈</h3>
+                                <p class="text-gray-600 text-sm mt-1">炫酷舞蹈和潮流舞步</p>
+                            </div>
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="food">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-cutlery text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">美食</h3>
+                                <p class="text-gray-600 text-sm mt-1">烹饪技巧和美食推荐</p>
+                            </div>
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="tech">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-rocket text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">科技</h3>
+                                <p class="text-gray-600 text-sm mt-1">最新科技和创意发明</p>
+                            </div>
+                            <div class="category-card bg-white rounded-xl shadow p-4 hover:shadow-lg cursor-pointer transition-custom border-2 border-transparent hover:border-primary/20" data-category="life">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa fa-coffee text-primary text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">生活</h3>
+                                <p class="text-gray-600 text-sm mt-1">生活技巧和日常分享</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-center">
+                            <button id="continue-btn" class="bg-primary text-white font-bold py-3 px-8 rounded-full shadow hover:shadow-lg transform hover:-translate-y-1 transition-custom disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                继续浏览
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </main>
-    </body>
+        </section>
+
+        <!-- 第二次跳转页面 -->
+        <section id="second-step" class="py-16 bg-white hidden">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto bg-gray-50 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-secondary p-6 text-white">
+                        <h2 class="text-2xl font-bold">第二步：确认访问</h2>
+                        <p class="opacity-90 mt-1">即将进入视频内容平台，请确认您的选择</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="bg-white rounded-xl shadow p-6 mb-6">
+                            <h3 class="font-bold text-xl mb-3">您选择的内容类别：<span id="selected-category" class="text-secondary">未选择</span></h3>
+                            <p class="text-gray-600 mb-4">
+                                您即将访问的是一个充满活力和创意的视频内容平台，这里有海量的优质短视频内容等待您的探索。
+                            </p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-700"><i class="fa fa-info-circle text-secondary mr-2"></i> 请注意：</p>
+                                <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 space-y-1">
+                                    <li>请遵守平台规则和网络文明公约</li>
+                                    <li>未成年人请在监护人指导下使用</li>
+                                    <li>长时间观看可能影响您的视力</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-center gap-4">
+                            <button id="confirm-btn" class="bg-secondary text-white font-bold py-3 px-8 rounded-full shadow hover:shadow-lg transform hover:-translate-y-1 transition-custom">
+                                确认访问
+                            </button>
+                            <button id="back-btn" class="bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-full hover:bg-gray-300 transition-custom">
+                                返回上一步
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 加载页面 -->
+        <section id="loading-step" class="py-16 bg-white hidden">
+            <div class="container mx-auto px-4">
+                <div class="max-w-2xl mx-auto text-center">
+                    <div class="inline-block w-24 h-24 border-8 border-primary/30 border-t-primary rounded-full animate-spin mb-6"></div>
+                    <h2 class="text-2xl font-bold text-dark mb-3">正在加载内容</h2>
+                    <p class="text-gray-600 mb-6">请稍候，我们正在为您准备精彩内容...</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="loading-percentage" class="text-gray-500">0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 特点部分 -->
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">为什么选择我们</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-custom">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-bolt text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">快速加载</h3>
+                        <p class="text-gray-600">优化的加载流程，让您无需等待，立即享受精彩内容。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-custom">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-th-large text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">海量内容</h3>
+                        <p class="text-gray-600">涵盖各种类别和主题的视频，满足您的多样化需求。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-custom">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-shield text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">安全可靠</h3>
+                        <p class="text-gray-600">严格的内容审核机制，确保您看到的都是优质内容。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户评价 -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">用户怎么说</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition-custom">
+                        <div class="flex items-center mb-4">
+                            <img src="https://picsum.photos/seed/user1/60/60" alt="用户头像" class="w-12 h-12 rounded-full object-cover">
+                            <div class="ml-4">
+                                <h4 class="font-bold">李明</h4>
+                                <div class="flex text-yellow-400 text-sm">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">"这个平台的内容真的很丰富，我每天都会花一些时间在这里浏览有趣的视频，推荐给大家！"</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition-custom">
+                        <div class="flex items-center mb-4">
+                            <img src="https://picsum.photos/seed/user2/60/60" alt="用户头像" class="w-12 h-12 rounded-full object-cover">
+                            <div class="ml-4">
+                                <h4 class="font-bold">张华</h4>
+                                <div class="flex text-yellow-400 text-sm">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">"界面很简洁，使用起来非常方便，内容也很有趣，是我每天必看的内容之一。"</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition-custom">
+                        <div class="flex items-center mb-4">
+                            <img src="https://picsum.photos/seed/user3/60/60" alt="用户头像" class="w-12 h-12 rounded-full object-cover">
+                            <div class="ml-4">
+                                <h4 class="font-bold">王芳</h4>
+                                <div class="flex text-yellow-400 text-sm">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">"发现了很多有意思的创作者，内容质量很高，唯一的建议是希望能增加更多分类。"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-play-circle text-primary text-2xl"></i>
+                        <h3 class="text-xl font-bold">视频探索平台</h3>
+                    </div>
+                    <p class="text-gray-400">探索精彩视频世界，发现更多有趣内容</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">快速链接</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition-custom">首页</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">发现</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">分类</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">关于我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">支持</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition-custom">帮助中心</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">联系我们</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">用户协议</a></li>
+                        <li><a href="#" class="hover:text-primary transition-custom">隐私政策</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">关注我们</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-youtube-play"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400">订阅我们的新闻资讯</p>
+                    <div class="mt-2 flex">
+                        <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg focus:outline-none text-gray-800 flex-grow">
+                        <button class="bg-primary px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-custom">
+                            订阅
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 视频探索平台. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.add('py-3', 'shadow-md');
+                navbar.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 页面元素
+        const startBtn = document.getElementById('start-btn');
+        const firstStep = document.getElementById('first-step');
+        const secondStep = document.getElementById('second-step');
+        const loadingStep = document.getElementById('loading-step');
+        const continueBtn = document.getElementById('continue-btn');
+        const backBtn = document.getElementById('back-btn');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const selectedCategory = document.getElementById('selected-category');
+        const progressBar = document.getElementById('progress-bar');
+        const loadingPercentage = document.getElementById('loading-percentage');
+        const categoryCards = document.querySelectorAll('.category-card');
+        
+        let chosenCategory = null;
+
+        // 第一步：开始探索
+        startBtn.addEventListener('click', function() {
+            firstStep.classList.remove('hidden');
+            // 平滑滚动到第一步
+            firstStep.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 选择分类
+        categoryCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // 移除所有卡片的选中状态
+                categoryCards.forEach(c => c.classList.remove('border-primary'));
+                // 添加当前卡片的选中状态
+                this.classList.add('border-primary');
+                // 保存选中的分类
+                chosenCategory = this.dataset.category;
+                // 更新按钮状态
+                continueBtn.disabled = false;
+            });
+        });
+
+        // 继续浏览
+        continueBtn.addEventListener('click', function() {
+            if (chosenCategory) {
+                // 更新选中的分类显示
+                selectedCategory.textContent = chosenCategory.charAt(0).toUpperCase() + chosenCategory.slice(1);
+                // 隐藏第一步，显示第二步
+                firstStep.classList.add('hidden');
+                secondStep.classList.remove('hidden');
+                // 平滑滚动到第二步
+                secondStep.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // 返回上一步
+        backBtn.addEventListener('click', function() {
+            secondStep.classList.add('hidden');
+            firstStep.classList.remove('hidden');
+            // 平滑滚动到第一步
+            firstStep.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 确认访问
+        confirmBtn.addEventListener('click', function() {
+            secondStep.classList.add('hidden');
+            loadingStep.classList.remove('hidden');
+            // 平滑滚动到加载页面
+            loadingStep.scrollIntoView({ behavior: 'smooth' });
+            
+            // 模拟加载进度
+            let progress = 0;
+            const interval = setInterval(function() {
+                progress += Math.random() * 15;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 加载完成后跳转到抖音
+                    setTimeout(function() {
+                        window.location.href = 'https://www.douyin.com/';
+                    }, 500);
+                }
+                
+                progressBar.style.width = `${progress}%`;
+                loadingPercentage.textContent = `${Math.round(progress)}%`;
+            }, 300);
+        });
+    </script>
+</body>
 </html>
+    
